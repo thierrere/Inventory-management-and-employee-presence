@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            <h:outputText value="#{bundle.ViewHistoriqueProduitTitle}"></h:outputText>
+        </ui:define>
+        <ui:define name="body">
+            <h:panelGroup id="messagePanel" layout="block">
+                <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
+            </h:panelGroup>
+            <h:form>
+                <h:panelGrid columns="2">
+                    <h:outputText value="#{bundle.ViewHistoriqueProduitLabel_id}"/>
+                    <h:outputText value="#{historiqueProduitController.selected.id}" title="#{bundle.ViewHistoriqueProduitTitle_id}"/>
+                    <h:outputText value="#{bundle.ViewHistoriqueProduitLabel_action}"/>
+                    <h:outputText value="#{historiqueProduitController.selected.action}" title="#{bundle.ViewHistoriqueProduitTitle_action}"/>
+                    <h:outputText value="#{bundle.ViewHistoriqueProduitLabel_produit}"/>
+                    <h:outputText value="#{historiqueProduitController.selected.produit}" title="#{bundle.ViewHistoriqueProduitTitle_produit}"/>
+                    <h:outputText value="#{bundle.ViewHistoriqueProduitLabel_classeProduit}"/>
+                    <h:outputText value="#{historiqueProduitController.selected.classeProduit}" title="#{bundle.ViewHistoriqueProduitTitle_classeProduit}"/>
+                    <h:outputText value="#{bundle.ViewHistoriqueProduitLabel_quantite}"/>
+                    <h:outputText value="#{historiqueProduitController.selected.quantite}" title="#{bundle.ViewHistoriqueProduitTitle_quantite}"/>
+                    <h:outputText value="#{bundle.ViewHistoriqueProduitLabel_destinataire}"/>
+                    <h:outputText value="#{historiqueProduitController.selected.destinataire}" title="#{bundle.ViewHistoriqueProduitTitle_destinataire}"/>
+                    <h:outputText value="#{bundle.ViewHistoriqueProduitLabel_date}"/>
+                    <h:outputText value="#{historiqueProduitController.selected.date}" title="#{bundle.ViewHistoriqueProduitTitle_date}">
+                        <f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" />
+                    </h:outputText>
+                    <h:outputText value="#{bundle.ViewHistoriqueProduitLabel_users}"/>
+                    <h:outputText value="#{historiqueProduitController.selected.users}" title="#{bundle.ViewHistoriqueProduitTitle_users}"/>
+                </h:panelGrid>
+                <br />
+                <h:commandLink action="#{historiqueProduitController.destroyAndView}" value="#{bundle.ViewHistoriqueProduitDestroyLink}"/>
+                <br />
+                <br />
+                <h:link outcome="Edit" value="#{bundle.ViewHistoriqueProduitEditLink}"/>
+                <br />
+                <h:commandLink action="#{historiqueProduitController.prepareCreate}" value="#{bundle.ViewHistoriqueProduitCreateLink}" />
+                <br />
+                <h:commandLink action="#{historiqueProduitController.prepareList}" value="#{bundle.ViewHistoriqueProduitShowAllLink}"/>
+                <br />
+                <br />
+                <h:link outcome="/index" value="#{bundle.ViewHistoriqueProduitIndexLink}"/>
+
+            </h:form>
+        </ui:define>
+    </ui:composition>
+
+</html>

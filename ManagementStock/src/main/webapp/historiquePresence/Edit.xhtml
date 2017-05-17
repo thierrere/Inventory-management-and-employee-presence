@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            <h:outputText value="#{bundle.EditHistoriquePresenceTitle}"></h:outputText>
+        </ui:define>
+        <ui:define name="body">
+            <h:panelGroup id="messagePanel" layout="block">
+                <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
+            </h:panelGroup>
+            <h:form>
+                <h:panelGrid columns="2">
+                    <h:outputLabel value="#{bundle.EditHistoriquePresenceLabel_id}" for="id" />
+                    <h:inputText id="id" value="#{historiquePresenceController.selected.id}" title="#{bundle.EditHistoriquePresenceTitle_id}" required="true" requiredMessage="#{bundle.EditHistoriquePresenceRequiredMessage_id}"/>
+                    <h:outputLabel value="#{bundle.EditHistoriquePresenceLabel_journee}" for="journee" />
+                    <h:inputText id="journee" value="#{historiquePresenceController.selected.journee}" title="#{bundle.EditHistoriquePresenceTitle_journee}" >
+                        <f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" />
+                    </h:inputText>
+                    <h:outputLabel value="#{bundle.EditHistoriquePresenceLabel_heureArrivee}" for="heureArrivee" />
+                    <h:inputText id="heureArrivee" value="#{historiquePresenceController.selected.heureArrivee}" title="#{bundle.EditHistoriquePresenceTitle_heureArrivee}" />
+                    <h:outputLabel value="#{bundle.EditHistoriquePresenceLabel_heureDepart}" for="heureDepart" />
+                    <h:inputText id="heureDepart" value="#{historiquePresenceController.selected.heureDepart}" title="#{bundle.EditHistoriquePresenceTitle_heureDepart}" />
+                    <h:outputLabel value="#{bundle.EditHistoriquePresenceLabel_dateSaisie}" for="dateSaisie" />
+                    <h:inputText id="dateSaisie" value="#{historiquePresenceController.selected.dateSaisie}" title="#{bundle.EditHistoriquePresenceTitle_dateSaisie}" >
+                        <f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" />
+                    </h:inputText>
+                    <h:outputLabel value="#{bundle.EditHistoriquePresenceLabel_employe}" for="employe" />
+                    <h:selectOneMenu id="employe" value="#{historiquePresenceController.selected.employe}" title="#{bundle.EditHistoriquePresenceTitle_employe}" >
+                        <f:selectItems value="#{employeController.itemsAvailableSelectOne}"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel value="#{bundle.EditHistoriquePresenceLabel_users}" for="users" />
+                    <h:selectOneMenu id="users" value="#{historiquePresenceController.selected.users}" title="#{bundle.EditHistoriquePresenceTitle_users}" >
+                        <f:selectItems value="#{usersController.itemsAvailableSelectOne}"/>
+                    </h:selectOneMenu>
+                </h:panelGrid>
+                <h:commandLink action="#{historiquePresenceController.update}" value="#{bundle.EditHistoriquePresenceSaveLink}"/>
+                <br />
+                <br />
+                <h:link outcome="View" value="#{bundle.EditHistoriquePresenceViewLink}"/>
+                <br />
+                <h:commandLink action="#{historiquePresenceController.prepareList}" value="#{bundle.EditHistoriquePresenceShowAllLink}" immediate="true"/>
+                <br />
+                <br />
+                <h:link outcome="/index" value="#{bundle.EditHistoriquePresenceIndexLink}" />
+            </h:form>
+        </ui:define>
+    </ui:composition>
+
+</html>

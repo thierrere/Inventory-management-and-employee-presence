@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            <h:outputText value="#{bundle.EditRoleEmployeTitle}"></h:outputText>
+        </ui:define>
+        <ui:define name="body">
+            <h:panelGroup id="messagePanel" layout="block">
+                <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
+            </h:panelGroup>
+            <h:form>
+                <h:panelGrid columns="2">
+                    <h:outputLabel value="#{bundle.EditRoleEmployeLabel_id}" for="id" />
+                    <h:inputText id="id" value="#{roleEmployeController.selected.id}" title="#{bundle.EditRoleEmployeTitle_id}" required="true" requiredMessage="#{bundle.EditRoleEmployeRequiredMessage_id}"/>
+                    <h:outputLabel value="#{bundle.EditRoleEmployeLabel_role}" for="role" />
+                    <h:inputText id="role" value="#{roleEmployeController.selected.role}" title="#{bundle.EditRoleEmployeTitle_role}" />
+                </h:panelGrid>
+                <h:commandLink action="#{roleEmployeController.update}" value="#{bundle.EditRoleEmployeSaveLink}"/>
+                <br />
+                <br />
+                <h:link outcome="View" value="#{bundle.EditRoleEmployeViewLink}"/>
+                <br />
+                <h:commandLink action="#{roleEmployeController.prepareList}" value="#{bundle.EditRoleEmployeShowAllLink}" immediate="true"/>
+                <br />
+                <br />
+                <h:link outcome="/index" value="#{bundle.EditRoleEmployeIndexLink}" />
+            </h:form>
+        </ui:define>
+    </ui:composition>
+
+</html>

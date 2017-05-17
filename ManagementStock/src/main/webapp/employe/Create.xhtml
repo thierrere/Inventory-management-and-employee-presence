@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            <h:outputText value="#{bundle.CreateEmployeTitle}"></h:outputText>
+        </ui:define>
+        <ui:define name="body">
+            <h:panelGroup id="messagePanel" layout="block">
+                <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
+            </h:panelGroup>
+            <h:form>
+                <h:panelGrid columns="2">
+                    <h:outputLabel value="#{bundle.CreateEmployeLabel_id}" for="id" />
+                    <h:inputText id="id" value="#{employeController.selected.id}" title="#{bundle.CreateEmployeTitle_id}" required="true" requiredMessage="#{bundle.CreateEmployeRequiredMessage_id}"/>
+                    <h:outputLabel value="#{bundle.CreateEmployeLabel_nom}" for="nom" />
+                    <h:inputText id="nom" value="#{employeController.selected.nom}" title="#{bundle.CreateEmployeTitle_nom}" />
+                    <h:outputLabel value="#{bundle.CreateEmployeLabel_prenom}" for="prenom" />
+                    <h:inputText id="prenom" value="#{employeController.selected.prenom}" title="#{bundle.CreateEmployeTitle_prenom}" />
+                    <h:outputLabel value="#{bundle.CreateEmployeLabel_telephone}" for="telephone" />
+                    <h:inputText id="telephone" value="#{employeController.selected.telephone}" title="#{bundle.CreateEmployeTitle_telephone}" />
+                    <h:outputLabel value="#{bundle.CreateEmployeLabel_dateEmbauche}" for="dateEmbauche" />
+                    <h:inputText id="dateEmbauche" value="#{employeController.selected.dateEmbauche}" title="#{bundle.CreateEmployeTitle_dateEmbauche}" >
+                        <f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" />
+                    </h:inputText>
+                    <h:outputLabel value="#{bundle.CreateEmployeLabel_dateDebauche}" for="dateDebauche" />
+                    <h:inputText id="dateDebauche" value="#{employeController.selected.dateDebauche}" title="#{bundle.CreateEmployeTitle_dateDebauche}" >
+                        <f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" />
+                    </h:inputText>
+                    <h:outputLabel value="#{bundle.CreateEmployeLabel_status}" for="status" />
+                    <h:inputText id="status" value="#{employeController.selected.status}" title="#{bundle.CreateEmployeTitle_status}" />
+                    <h:outputLabel value="#{bundle.CreateEmployeLabel_role}" for="role" />
+                    <h:selectOneMenu id="role" value="#{employeController.selected.role}" title="#{bundle.CreateEmployeTitle_role}" >
+                        <f:selectItems value="#{roleEmployeController.itemsAvailableSelectOne}"/>
+                    </h:selectOneMenu>
+                </h:panelGrid>
+                <br />
+                <h:commandLink action="#{employeController.create}" value="#{bundle.CreateEmployeSaveLink}" />
+                <br />
+                <br />
+                <h:commandLink action="#{employeController.prepareList}" value="#{bundle.CreateEmployeShowAllLink}" immediate="true"/>
+                <br />
+                <br />
+                <h:link outcome="/index" value="#{bundle.CreateEmployeIndexLink}"/>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+
+</html>

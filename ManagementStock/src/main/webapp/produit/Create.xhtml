@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            <h:outputText value="#{bundle.CreateProduitTitle}"></h:outputText>
+        </ui:define>
+        <ui:define name="body">
+            <h:panelGroup id="messagePanel" layout="block">
+                <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
+            </h:panelGroup>
+            <h:form>
+                <h:panelGrid columns="2">
+                    <h:outputLabel value="#{bundle.CreateProduitLabel_id}" for="id" />
+                    <h:inputText id="id" value="#{produitController.selected.id}" title="#{bundle.CreateProduitTitle_id}" required="true" requiredMessage="#{bundle.CreateProduitRequiredMessage_id}"/>
+                    <h:outputLabel value="#{bundle.CreateProduitLabel_designation}" for="designation" />
+                    <h:inputText id="designation" value="#{produitController.selected.designation}" title="#{bundle.CreateProduitTitle_designation}" />
+                    <h:outputLabel value="#{bundle.CreateProduitLabel_quantite}" for="quantite" />
+                    <h:inputText id="quantite" value="#{produitController.selected.quantite}" title="#{bundle.CreateProduitTitle_quantite}" />
+                    <h:outputLabel value="#{bundle.CreateProduitLabel_nombreExemplaire}" for="nombreExemplaire" />
+                    <h:inputText id="nombreExemplaire" value="#{produitController.selected.nombreExemplaire}" title="#{bundle.CreateProduitTitle_nombreExemplaire}" />
+                    <h:outputLabel value="#{bundle.CreateProduitLabel_etat}" for="etat" />
+                    <h:inputText id="etat" value="#{produitController.selected.etat}" title="#{bundle.CreateProduitTitle_etat}" />
+                    <h:outputLabel value="#{bundle.CreateProduitLabel_classe}" for="classe" />
+                    <h:selectOneMenu id="classe" value="#{produitController.selected.classe}" title="#{bundle.CreateProduitTitle_classe}" >
+                        <f:selectItems value="#{classeProduitController.itemsAvailableSelectOne}"/>
+                    </h:selectOneMenu>
+                </h:panelGrid>
+                <br />
+                <h:commandLink action="#{produitController.create}" value="#{bundle.CreateProduitSaveLink}" />
+                <br />
+                <br />
+                <h:commandLink action="#{produitController.prepareList}" value="#{bundle.CreateProduitShowAllLink}" immediate="true"/>
+                <br />
+                <br />
+                <h:link outcome="/index" value="#{bundle.CreateProduitIndexLink}"/>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+
+</html>

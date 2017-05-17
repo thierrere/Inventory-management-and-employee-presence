@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            <h:outputText value="#{bundle.EditHistoriqueProduitTitle}"></h:outputText>
+        </ui:define>
+        <ui:define name="body">
+            <h:panelGroup id="messagePanel" layout="block">
+                <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
+            </h:panelGroup>
+            <h:form>
+                <h:panelGrid columns="2">
+                    <h:outputLabel value="#{bundle.EditHistoriqueProduitLabel_id}" for="id" />
+                    <h:inputText id="id" value="#{historiqueProduitController.selected.id}" title="#{bundle.EditHistoriqueProduitTitle_id}" required="true" requiredMessage="#{bundle.EditHistoriqueProduitRequiredMessage_id}"/>
+                    <h:outputLabel value="#{bundle.EditHistoriqueProduitLabel_action}" for="action" />
+                    <h:inputText id="action" value="#{historiqueProduitController.selected.action}" title="#{bundle.EditHistoriqueProduitTitle_action}" />
+                    <h:outputLabel value="#{bundle.EditHistoriqueProduitLabel_produit}" for="produit" />
+                    <h:inputText id="produit" value="#{historiqueProduitController.selected.produit}" title="#{bundle.EditHistoriqueProduitTitle_produit}" />
+                    <h:outputLabel value="#{bundle.EditHistoriqueProduitLabel_classeProduit}" for="classeProduit" />
+                    <h:inputText id="classeProduit" value="#{historiqueProduitController.selected.classeProduit}" title="#{bundle.EditHistoriqueProduitTitle_classeProduit}" />
+                    <h:outputLabel value="#{bundle.EditHistoriqueProduitLabel_quantite}" for="quantite" />
+                    <h:inputText id="quantite" value="#{historiqueProduitController.selected.quantite}" title="#{bundle.EditHistoriqueProduitTitle_quantite}" />
+                    <h:outputLabel value="#{bundle.EditHistoriqueProduitLabel_destinataire}" for="destinataire" />
+                    <h:inputText id="destinataire" value="#{historiqueProduitController.selected.destinataire}" title="#{bundle.EditHistoriqueProduitTitle_destinataire}" />
+                    <h:outputLabel value="#{bundle.EditHistoriqueProduitLabel_date}" for="date" />
+                    <h:inputText id="date" value="#{historiqueProduitController.selected.date}" title="#{bundle.EditHistoriqueProduitTitle_date}" >
+                        <f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" />
+                    </h:inputText>
+                    <h:outputLabel value="#{bundle.EditHistoriqueProduitLabel_users}" for="users" />
+                    <h:selectOneMenu id="users" value="#{historiqueProduitController.selected.users}" title="#{bundle.EditHistoriqueProduitTitle_users}" >
+                        <f:selectItems value="#{usersController.itemsAvailableSelectOne}"/>
+                    </h:selectOneMenu>
+                </h:panelGrid>
+                <h:commandLink action="#{historiqueProduitController.update}" value="#{bundle.EditHistoriqueProduitSaveLink}"/>
+                <br />
+                <br />
+                <h:link outcome="View" value="#{bundle.EditHistoriqueProduitViewLink}"/>
+                <br />
+                <h:commandLink action="#{historiqueProduitController.prepareList}" value="#{bundle.EditHistoriqueProduitShowAllLink}" immediate="true"/>
+                <br />
+                <br />
+                <h:link outcome="/index" value="#{bundle.EditHistoriqueProduitIndexLink}" />
+            </h:form>
+        </ui:define>
+    </ui:composition>
+
+</html>

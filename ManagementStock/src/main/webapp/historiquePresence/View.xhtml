@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            <h:outputText value="#{bundle.ViewHistoriquePresenceTitle}"></h:outputText>
+        </ui:define>
+        <ui:define name="body">
+            <h:panelGroup id="messagePanel" layout="block">
+                <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
+            </h:panelGroup>
+            <h:form>
+                <h:panelGrid columns="2">
+                    <h:outputText value="#{bundle.ViewHistoriquePresenceLabel_id}"/>
+                    <h:outputText value="#{historiquePresenceController.selected.id}" title="#{bundle.ViewHistoriquePresenceTitle_id}"/>
+                    <h:outputText value="#{bundle.ViewHistoriquePresenceLabel_journee}"/>
+                    <h:outputText value="#{historiquePresenceController.selected.journee}" title="#{bundle.ViewHistoriquePresenceTitle_journee}">
+                        <f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" />
+                    </h:outputText>
+                    <h:outputText value="#{bundle.ViewHistoriquePresenceLabel_heureArrivee}"/>
+                    <h:outputText value="#{historiquePresenceController.selected.heureArrivee}" title="#{bundle.ViewHistoriquePresenceTitle_heureArrivee}"/>
+                    <h:outputText value="#{bundle.ViewHistoriquePresenceLabel_heureDepart}"/>
+                    <h:outputText value="#{historiquePresenceController.selected.heureDepart}" title="#{bundle.ViewHistoriquePresenceTitle_heureDepart}"/>
+                    <h:outputText value="#{bundle.ViewHistoriquePresenceLabel_dateSaisie}"/>
+                    <h:outputText value="#{historiquePresenceController.selected.dateSaisie}" title="#{bundle.ViewHistoriquePresenceTitle_dateSaisie}">
+                        <f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" />
+                    </h:outputText>
+                    <h:outputText value="#{bundle.ViewHistoriquePresenceLabel_employe}"/>
+                    <h:outputText value="#{historiquePresenceController.selected.employe}" title="#{bundle.ViewHistoriquePresenceTitle_employe}"/>
+                    <h:outputText value="#{bundle.ViewHistoriquePresenceLabel_users}"/>
+                    <h:outputText value="#{historiquePresenceController.selected.users}" title="#{bundle.ViewHistoriquePresenceTitle_users}"/>
+                </h:panelGrid>
+                <br />
+                <h:commandLink action="#{historiquePresenceController.destroyAndView}" value="#{bundle.ViewHistoriquePresenceDestroyLink}"/>
+                <br />
+                <br />
+                <h:link outcome="Edit" value="#{bundle.ViewHistoriquePresenceEditLink}"/>
+                <br />
+                <h:commandLink action="#{historiquePresenceController.prepareCreate}" value="#{bundle.ViewHistoriquePresenceCreateLink}" />
+                <br />
+                <h:commandLink action="#{historiquePresenceController.prepareList}" value="#{bundle.ViewHistoriquePresenceShowAllLink}"/>
+                <br />
+                <br />
+                <h:link outcome="/index" value="#{bundle.ViewHistoriquePresenceIndexLink}"/>
+
+            </h:form>
+        </ui:define>
+    </ui:composition>
+
+</html>
