@@ -6,6 +6,7 @@
 package com.management.sessionbeans;
 
 import com.management.jpa.HistoriquePresence;
+import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
@@ -13,10 +14,10 @@ import javax.persistence.PersistenceContext;
  *
  * @author Thierry
  */
-@javax.ejb.Stateless
+@Stateless
 public class HistoriquePresenceFacade extends AbstractFacade<HistoriquePresence> {
 
-    @PersistenceContext(unitName = "com.management.stock_ManagementStock_war_1.0-SNAPSHOTPU")
+    @PersistenceContext(unitName = "Edifice_StockPU")
     private EntityManager em;
 
     @Override

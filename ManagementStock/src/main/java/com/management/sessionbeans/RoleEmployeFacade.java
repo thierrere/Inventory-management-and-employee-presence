@@ -6,6 +6,8 @@
 package com.management.sessionbeans;
 
 import com.management.jpa.RoleEmploye;
+import java.util.List;
+import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
@@ -13,10 +15,10 @@ import javax.persistence.PersistenceContext;
  *
  * @author Thierry
  */
-@javax.ejb.Stateless
+@Stateless
 public class RoleEmployeFacade extends AbstractFacade<RoleEmploye> {
 
-    @PersistenceContext(unitName = "com.management.stock_ManagementStock_war_1.0-SNAPSHOTPU")
+    @PersistenceContext(unitName = "Edifice_StockPU")
     private EntityManager em;
 
     @Override
@@ -26,6 +28,12 @@ public class RoleEmployeFacade extends AbstractFacade<RoleEmploye> {
 
     public RoleEmployeFacade() {
         super(RoleEmploye.class);
+    }
+    
+    public List<RoleEmploye> orderAllRole(){
+        String req = "select * from role_employe order by role ASC";
+        List<RoleEmploye> list = (List<RoleEmploye>) em.createNativeQuery(req, RoleEmploye.class).getResultList();
+        return list;
     }
     
 }

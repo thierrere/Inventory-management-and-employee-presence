@@ -7,7 +7,10 @@ import com.management.sessionbeans.ClasseProduitFacade;
 
 import java.io.Serializable;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.EJB;
+//import javax.inject.Named;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.component.UIComponent;
@@ -17,8 +20,11 @@ import javax.faces.convert.FacesConverter;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
 import javax.faces.model.SelectItem;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceContext;
 
-@ManagedBean(name = "classeProduitController")
+@ManagedBean(name="classeProduitController")
 @SessionScoped
 public class ClasseProduitController implements Serializable {
 
@@ -26,8 +32,16 @@ public class ClasseProduitController implements Serializable {
     private DataModel items = null;
     @EJB
     private com.management.sessionbeans.ClasseProduitFacade ejbFacade;
+    @PersistenceContext
+    private EntityManager entityManager;
     private PaginationHelper pagination;
     private int selectedItemIndex;
+    private Boolean bol = false;
+    private String find;
+    private DataModel<ClasseProduit> allClasse;
+    private Boolean updateForm = false;
+    private String nouveauNom;
+    private ClasseProduit toModify;
 
     public ClasseProduitController() {
     }
@@ -39,9 +53,69 @@ public class ClasseProduitController implements Serializable {
         }
         return current;
     }
+    
+    public void modifierCurrent(ClasseProduit c){
+        current=c;
+    }
 
     private ClasseProduitFacade getFacade() {
         return ejbFacade;
+    }
+
+    public void afForm() {
+        bol = true;
+    }
+
+    public void annuler() {
+        bol = false;
+        current = null;
+    }
+
+    public Boolean getBol() {
+        return bol;
+    }
+
+    public Boolean cacheButton() {
+        return !(bol == true || updateForm == true);
+    }
+
+    public Boolean getUpdateForm() {
+        return updateForm;
+    }
+
+    public void setUpdateForm(Boolean updateForm) {
+        this.updateForm = updateForm;
+    }
+
+    public void closeDialogUpdate() {
+        updateForm = false;
+    }
+
+    public String getFind() {
+        return find;
+    }
+
+    public void setFind(String find) {
+        this.find = find;
+    }
+
+    public void findClasse() {
+        System.out.println("Recherche= " + this.getFind());
+    }
+
+    public DataModel<ClasseProduit> getAllClasse() {
+        //String req = "select * from classe_produit order by nom ASC";
+        //List<ClasseProduit> list = (List<ClasseProduit>) entityManager.createNativeQuery(req, ClasseProduit.class).getResultList();
+        //System.out.println("Taille allClasse: "+allClasse.size());
+        if(allClasse==null){
+        allClasse = new ListDataModel<>();
+        allClasse.setWrappedData(getFacade().orderAllClasse());
+        }
+        return allClasse;
+    }
+
+    public void setAllClasse(DataModel<ClasseProduit> allClasse) {
+        this.allClasse = allClasse;
     }
 
     public PaginationHelper getPagination() {
@@ -67,53 +141,137 @@ public class ClasseProduitController implements Serializable {
         return "List";
     }
 
-    public String prepareView() {
+    public void prepareView() {
+        current = (ClasseProduit) getAllClasse().getRowData();
+    }
+
+    /*public String prepareView() {
         current = (ClasseProduit) getItems().getRowData();
         selectedItemIndex = pagination.getPageFirstItem() + getItems().getRowIndex();
         return "View";
-    }
-
-    public String prepareCreate() {
-        current = new ClasseProduit();
-        selectedItemIndex = -1;
-        return "Create";
-    }
-
-    public String create() {
+    }*/
+    public ClasseProduit verifyUnicity(String nom) {
+        ClasseProduit retour;
         try {
-            getFacade().create(current);
-            JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("ClasseProduitCreated"));
-            return prepareCreate();
+            retour = entityManager.createNamedQuery("ClasseProduit.findByNom", ClasseProduit.class).setParameter("nom", nom).getSingleResult();
+        } catch (NoResultException e) {
+            retour = null;
+        }
+        return retour;
+    }
+
+    public void prepareCreate() {
+        current = null;
+        //selectedItemIndex = -1;
+        updateForm = false;
+        // return "Create";
+    }
+
+    //Insérer l'unicité dans le processus de création
+    public void create() {
+        if(getSelected().getNom().equals("")){
+            JsfUtil.addErrorMessage("Aucun nom de famille saisie!! Veuillez saisir avant de valider");
+            return;
+        }
+        try {
+            ClasseProduit retour = this.verifyUnicity(this.getSelected().getNom());
+            if (retour != null) {
+                JsfUtil.addErrorMessage(ResourceBundle.getBundle("/Bundle").getString("ClasseProduitNotUnique"));
+                Logger.getLogger(ProduitController.class.getName()).log(Level.SEVERE,"Famille de produit déjà existante!!");
+            } else {
+                getFacade().create(current);
+                JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("ClasseProduitCreated"));
+                Logger.getLogger(ProduitController.class.getName()).log(Level.INFO,"Famille crée avec succès!!");
+                //JsfUtil.addSuccessMessage("C'est correct!");
+                recreateModel();
+                prepareCreate();
+            }
+            //return prepareCreate();
         } catch (Exception e) {
             JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
-            return null;
+            Logger.getLogger(ProduitController.class.getName()).log(Level.SEVERE,null,e);
+            //return null;
         }
     }
 
-    public String prepareEdit() {
-        current = (ClasseProduit) getItems().getRowData();
-        selectedItemIndex = pagination.getPageFirstItem() + getItems().getRowIndex();
-        return "Edit";
+    /* public void prepareUpdate(){
+        current=null;
+        updateForm=false;
+        current = (ClasseProduit) allClasse.getRowData();
+        updateForm=true;
+    }*/
+
+    public String getNouveauNom() {
+        return nouveauNom;
     }
 
-    public String update() {
+    public void setNouveauNom(String nouveauNom) {
+        this.nouveauNom = nouveauNom;
+    }
+    
+    public void prepareEdit() {
+        toModify =(ClasseProduit) allClasse.getRowData();
+        //current=(ClasseProduit) allClasse.getRowData();
+        System.out.println("Famille selectionnée: "+getSelected().toString());
+        nouveauNom=toModify.getNom();
+        updateForm = true;
+        bol=false;
+    }
+    
+    public ClasseProduit getToModify() {
+        if(toModify==null){
+            toModify=new ClasseProduit();
+            toModify.setNom("");
+        }
+        return toModify;
+    }
+    
+    public void test(){
+        System.out.println("Oui j'ai clické!!");
+    }
+
+    public void update() {
+        System.out.println("Mise à jour de la famille: "+ toModify.toString() +" en cours!!!");
+        if(toModify.getNom().equals("")){
+            JsfUtil.addErrorMessage("Aucun nom de famille saisie!! Veuillez saisir avant de valider");
+            return;
+        }
         try {
-            getFacade().edit(current);
-            JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("ClasseProduitUpdated"));
-            return "View";
+            ClasseProduit retour = this.verifyUnicity(nouveauNom);
+            if (retour != null) {
+                JsfUtil.addErrorMessage(ResourceBundle.getBundle("/Bundle").getString("ClasseProduitNotUnique"));
+                Logger.getLogger(ProduitController.class.getName()).log(Level.SEVERE,"Famille de produit déjà existante!!");
+            } else {
+                toModify.setNom(getNouveauNom());
+                getFacade().edit(toModify);
+                JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("ClasseProduitUpdated"));
+                Logger.getLogger(ProduitController.class.getName()).log(Level.INFO,"Famille de produit mis à jour avec succès!!");
+                //return "View";
+                updateForm = false;
+                toModify=null;
+                recreateModel();
+            }
         } catch (Exception e) {
             JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
-            return null;
+            Logger.getLogger(ProduitController.class.getName()).log(Level.INFO,null,e);
+            //return null;
         }
+
     }
 
-    public String destroy() {
-        current = (ClasseProduit) getItems().getRowData();
-        selectedItemIndex = pagination.getPageFirstItem() + getItems().getRowIndex();
-        performDestroy();
-        recreatePagination();
-        recreateModel();
-        return "List";
+    public void destroy() {
+        current = (ClasseProduit) allClasse.getRowData();
+        System.out.println("Nombre de produits dans la famille " + current.getNom() + " " + current.getProduitList().size());
+        if (current.getProduitList().isEmpty()) {
+            performDestroy();
+            recreatePagination();
+            recreateModel();
+            JsfUtil.addSuccessMessage("Famille supprimée avec succès!!");
+            Logger.getLogger(ProduitController.class.getName()).log(Level.INFO,"Famille supprimée avec succès!!");
+        } else {
+            JsfUtil.addErrorMessage("Famille de produit impossible à supprimer, car elle contient des produits, veuillez soit changer la famille de ces produits, ou supprimer ces produits, ou bien changer le nom de la famille");
+            Logger.getLogger(ProduitController.class.getName()).log(Level.INFO,"Famille de produit impossible à supprimer, car elle contient des produits, veuillez d'abord supprimer ces produits, ou bien changer le nom de la famille!!");
+        }
     }
 
     public String destroyAndView() {
@@ -162,22 +320,23 @@ public class ClasseProduitController implements Serializable {
 
     private void recreateModel() {
         items = null;
+        allClasse = null;
     }
 
     private void recreatePagination() {
         pagination = null;
     }
 
-    public String next() {
+    public void next() {
         getPagination().nextPage();
         recreateModel();
-        return "List";
+        //return "List";
     }
 
-    public String previous() {
+    public void previous() {
         getPagination().previousPage();
         recreateModel();
-        return "List";
+        // return "List";
     }
 
     public SelectItem[] getItemsAvailableSelectMany() {
@@ -185,7 +344,12 @@ public class ClasseProduitController implements Serializable {
     }
 
     public SelectItem[] getItemsAvailableSelectOne() {
-        return JsfUtil.getSelectItems(ejbFacade.findAll(), true);
+        //System.out.println("nombre total items available: "+JsfUtil.getSelectItems(ejbFacade.findAll(), true).length);
+        return JsfUtil.getSelectItems(ejbFacade.orderAllClasse(), true);
+    }
+
+    public ClasseProduit getClasseProduit(java.lang.Integer id) {
+        return ejbFacade.find(id);
     }
 
     @FacesConverter(forClass = ClasseProduit.class)
@@ -198,7 +362,7 @@ public class ClasseProduitController implements Serializable {
             }
             ClasseProduitController controller = (ClasseProduitController) facesContext.getApplication().getELResolver().
                     getValue(facesContext.getELContext(), null, "classeProduitController");
-            return controller.ejbFacade.find(getKey(value));
+            return controller.getClasseProduit(getKey(value));
         }
 
         java.lang.Integer getKey(String value) {

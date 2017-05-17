@@ -7,7 +7,10 @@ import com.management.sessionbeans.RoleEmployeFacade;
 
 import java.io.Serializable;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.EJB;
+//import javax.inject.Named;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.component.UIComponent;
@@ -17,8 +20,11 @@ import javax.faces.convert.FacesConverter;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
 import javax.faces.model.SelectItem;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceContext;
 
-@ManagedBean(name = "roleEmployeController")
+@ManagedBean(name="roleEmployeController")
 @SessionScoped
 public class RoleEmployeController implements Serializable {
 
@@ -26,8 +32,16 @@ public class RoleEmployeController implements Serializable {
     private DataModel items = null;
     @EJB
     private com.management.sessionbeans.RoleEmployeFacade ejbFacade;
+    @PersistenceContext
+    private EntityManager entityManager;
     private PaginationHelper pagination;
     private int selectedItemIndex;
+    private Boolean bol = false;
+    private String find;
+    private DataModel<RoleEmploye> allRole;
+    private Boolean updateForm = false;
+    private String nouveauIntitule;
+    private RoleEmploye toModify;
 
     public RoleEmployeController() {
     }
@@ -39,9 +53,69 @@ public class RoleEmployeController implements Serializable {
         }
         return current;
     }
+    
+    public void modifierCurrent(RoleEmploye c){
+        current=c;
+    }
 
     private RoleEmployeFacade getFacade() {
         return ejbFacade;
+    }
+
+    public void afForm() {
+        bol = true;
+    }
+
+    public void annuler() {
+        bol = false;
+        current = null;
+    }
+
+    public Boolean getBol() {
+        return bol;
+    }
+
+    public Boolean cacheButton() {
+        return !(bol == true || updateForm == true);
+    }
+
+    public Boolean getUpdateForm() {
+        return updateForm;
+    }
+
+    public void setUpdateForm(Boolean updateForm) {
+        this.updateForm = updateForm;
+    }
+
+    public void closeDialogUpdate() {
+        updateForm = false;
+    }
+
+    public String getFind() {
+        return find;
+    }
+
+    public void setFind(String find) {
+        this.find = find;
+    }
+
+    public void findRole() {
+        System.out.println("Recherche= " + this.getFind());
+    }
+
+    public DataModel<RoleEmploye> getAllRole() {
+        //String req = "select * from classe_produit order by nom ASC";
+        //List<RoleEmploye> list = (List<RoleEmploye>) entityManager.createNativeQuery(req, RoleEmploye.class).getResultList();
+        //System.out.println("Taille allRole: "+allRole.size());
+        if(allRole==null){
+        allRole = new ListDataModel<>();
+        allRole.setWrappedData(getFacade().orderAllRole());
+        }
+        return allRole;
+    }
+
+    public void setAllRole(DataModel<RoleEmploye> allRole) {
+        this.allRole = allRole;
     }
 
     public PaginationHelper getPagination() {
@@ -67,53 +141,137 @@ public class RoleEmployeController implements Serializable {
         return "List";
     }
 
-    public String prepareView() {
+    public void prepareView() {
+        current = (RoleEmploye) getAllRole().getRowData();
+    }
+
+    /*public String prepareView() {
         current = (RoleEmploye) getItems().getRowData();
         selectedItemIndex = pagination.getPageFirstItem() + getItems().getRowIndex();
         return "View";
-    }
-
-    public String prepareCreate() {
-        current = new RoleEmploye();
-        selectedItemIndex = -1;
-        return "Create";
-    }
-
-    public String create() {
+    }*/
+    public RoleEmploye verifyUnicity(String nom) {
+        RoleEmploye retour;
         try {
-            getFacade().create(current);
-            JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("RoleEmployeCreated"));
-            return prepareCreate();
+            retour = entityManager.createNamedQuery("RoleEmploye.findByRole", RoleEmploye.class).setParameter("role", nom).getSingleResult();
+        } catch (NoResultException e) {
+            retour = null;
+        }
+        return retour;
+    }
+
+    public void prepareCreate() {
+        current = null;
+        //selectedItemIndex = -1;
+        updateForm = false;
+        // return "Create";
+    }
+
+    //Insérer l'unicité dans le processus de création
+    public void create() {
+        if(getSelected().getRole().equals("")){
+            JsfUtil.addErrorMessage("Aucun Intitulé de rôle saisie!! Veuillez saisir avant de valider");
+            return;
+        }
+        try {
+            RoleEmploye retour = this.verifyUnicity(this.getSelected().getRole());
+            if (retour != null) {
+                JsfUtil.addErrorMessage(ResourceBundle.getBundle("/Bundle").getString("RoleEmployeNotUnique"));
+                Logger.getLogger(ProduitController.class.getName()).log(Level.SEVERE,"Rôle déjà existant!!");
+            } else {
+                getFacade().create(current);
+                JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("RoleEmployeCreated"));
+                Logger.getLogger(ProduitController.class.getName()).log(Level.INFO,"Rôle crée avec succès!!");
+                //JsfUtil.addSuccessMessage("C'est correct!");
+                recreateModel();
+                prepareCreate();
+            }
+            //return prepareCreate();
         } catch (Exception e) {
             JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
-            return null;
+            Logger.getLogger(RoleEmployeController.class.getName()).log(Level.SEVERE,null,e);
+            //return null;
         }
     }
 
-    public String prepareEdit() {
-        current = (RoleEmploye) getItems().getRowData();
-        selectedItemIndex = pagination.getPageFirstItem() + getItems().getRowIndex();
-        return "Edit";
+    /* public void prepareUpdate(){
+        current=null;
+        updateForm=false;
+        current = (RoleEmploye) allRole.getRowData();
+        updateForm=true;
+    }*/
+
+    public String getNouveauIntitule() {
+        return nouveauIntitule;
     }
 
-    public String update() {
+    public void setNouveauIntitule(String nouveau) {
+        this.nouveauIntitule = nouveau;
+    }
+    
+    public void prepareEdit() {
+        toModify =(RoleEmploye) allRole.getRowData();
+        //current=(RoleEmploye) allRole.getRowData();
+        System.out.println("Rôle selectionnée: "+getSelected().toString());
+        nouveauIntitule=getSelected().getRole();
+        updateForm = true;
+        bol=false;
+    }
+
+    public RoleEmploye getToModify() {
+        if(toModify==null){
+            toModify=new RoleEmploye();
+        }
+        return toModify;
+    }
+    
+    
+    public void test(){
+        System.out.println("Oui j'ai clické!!");
+    }
+
+    public void update() {
+        System.out.println("Mise à jour du rôle: "+ toModify.toString() +" en cours!!!");
+        if(getSelected().getRole().equals("")){
+            JsfUtil.addErrorMessage("Aucun Intitulé de rôle saisie!! Veuillez saisir avant de valider");
+            return;
+        }
         try {
-            getFacade().edit(current);
-            JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("RoleEmployeUpdated"));
-            return "View";
+            RoleEmploye retour = this.verifyUnicity(nouveauIntitule);
+            if (retour != null) {
+                JsfUtil.addErrorMessage(ResourceBundle.getBundle("/Bundle").getString("RoleEmployeNotUnique"));
+                Logger.getLogger(RoleEmployeController.class.getName()).log(Level.SEVERE,"Rôle déjà existant!!");
+            } else {
+                toModify.setRole(getNouveauIntitule());
+                getFacade().edit(toModify);
+                JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("RoleEmployeUpdated"));
+                Logger.getLogger(RoleEmployeController.class.getName()).log(Level.INFO,"Rôle mis à jour avec succès!!");
+                //return "View";
+                updateForm = false;
+                toModify=null;
+                recreateModel();
+            }
         } catch (Exception e) {
             JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
-            return null;
+            Logger.getLogger(RoleEmployeController.class.getName()).log(Level.SEVERE,null,e);
+            //return null;
         }
+
     }
 
-    public String destroy() {
-        current = (RoleEmploye) getItems().getRowData();
-        selectedItemIndex = pagination.getPageFirstItem() + getItems().getRowIndex();
-        performDestroy();
-        recreatePagination();
-        recreateModel();
-        return "List";
+    public void destroy() {
+        current = (RoleEmploye) allRole.getRowData();
+        System.out.println("Nombre d'employé ayant ce " + current.getRole() + " " + current.getEmployeList().size());
+        if (current.getEmployeList().isEmpty()) {
+            performDestroy();
+            recreatePagination();
+            recreateModel();
+            JsfUtil.addSuccessMessage("Rôle supprimé avec succès!!");
+            Logger.getLogger(RoleEmployeController.class.getName()).log(Level.INFO,"Rôle supprimé avec succès!!");
+        } else {
+            JsfUtil.addErrorMessage("Rôle impossible à supprimer, car il existe encore des employés effectuant ce rôle, veuillez soit changer le rôle de ces employés, ou supprimer ces employés, ou bien changer l'intitulé du rôle!!");
+            Logger.getLogger(RoleEmployeController.class.getName()).log(Level.INFO,"Rôle impossible à supprimer, car il existe encore des employés effectuant ce rôle, veuillez soit changer le rôle de ces employés, ou supprimer ces employés, ou bien changer l'intitulé du rôle!!");
+        }
     }
 
     public String destroyAndView() {
@@ -162,22 +320,23 @@ public class RoleEmployeController implements Serializable {
 
     private void recreateModel() {
         items = null;
+        allRole = null;
     }
 
     private void recreatePagination() {
         pagination = null;
     }
 
-    public String next() {
+    public void next() {
         getPagination().nextPage();
         recreateModel();
-        return "List";
+        //return "List";
     }
 
-    public String previous() {
+    public void previous() {
         getPagination().previousPage();
         recreateModel();
-        return "List";
+        // return "List";
     }
 
     public SelectItem[] getItemsAvailableSelectMany() {
@@ -185,7 +344,12 @@ public class RoleEmployeController implements Serializable {
     }
 
     public SelectItem[] getItemsAvailableSelectOne() {
-        return JsfUtil.getSelectItems(ejbFacade.findAll(), true);
+        //System.out.println("nombre total items available: "+JsfUtil.getSelectItems(ejbFacade.findAll(), true).length);
+        return JsfUtil.getSelectItems(ejbFacade.orderAllRole(), true);
+    }
+
+    public RoleEmploye getRoleEmploye(java.lang.Integer id) {
+        return ejbFacade.find(id);
     }
 
     @FacesConverter(forClass = RoleEmploye.class)
@@ -198,7 +362,7 @@ public class RoleEmployeController implements Serializable {
             }
             RoleEmployeController controller = (RoleEmployeController) facesContext.getApplication().getELResolver().
                     getValue(facesContext.getELContext(), null, "roleEmployeController");
-            return controller.ejbFacade.find(getKey(value));
+            return controller.getRoleEmploye(getKey(value));
         }
 
         java.lang.Integer getKey(String value) {
